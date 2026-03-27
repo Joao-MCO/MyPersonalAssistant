@@ -7,12 +7,13 @@ import { useTheme } from 'next-themes';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { useAuth } from './Auth';
 
 function ChatInterface() {
     const [inputMessage, setInputMessage] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
-    const isAnonymous = true;
+    const { user, isAnonymous } = useAuth();
     const {theme} = useTheme();
 
     const handleSendMessage = () =>{

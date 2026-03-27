@@ -2,7 +2,7 @@
 
 import { LogIn, LogOut, Trash, User } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -10,14 +10,12 @@ import { Separator } from "./ui/separator";
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Badge } from "./ui/badge";
+import { useAuth } from "./Auth";
 
 export default function ChatSidebar(){
-    const isAnonymous = true;
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
     const { theme } = useTheme();
     const path = `/logo_${theme ? theme : "dark"}.png`;
-
+    const { user, isAnonymous, login, logout } = useAuth();
     const handleLogin = () => {
         window.location.href = '/api/google/auth';
     };
@@ -26,23 +24,6 @@ export default function ChatSidebar(){
 
     const handleSingOut = () => {};
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-        try {
-            const response = await fetch('/api/google/profile');
-            if (response.ok) {
-            const data = await response.json();
-            setUser(data);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar perfil:', error);
-        } finally {
-            setLoading(false);
-        }
-        };
-
-        fetchProfile();
-    }, []);
 
     const SidebarContent = () => {
         return (
@@ -90,7 +71,7 @@ export default function ChatSidebar(){
                                 </AvatarFallback>
                             </Avatar>
                             <div className="min-h-0 flex-1">
-                                <p className="text-sm font-medium line-clamp-1">Usuário Desconhecido</p>
+                                <p className="text-sm font-medium line-clamp-1">{isAnonymous ? "Usuário Desconhecido" : user.name}</p>
                                 <div className="flex items-center space-x-1">
                                     <Badge variant={isAnonymous ? "secondary" : "default"}>
                                         {isAnonymous ? "Desconhecido" : "Logado"}

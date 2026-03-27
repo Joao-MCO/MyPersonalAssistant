@@ -2,6 +2,7 @@ import "./globals.css";
 import ChatSidebar from "@/components/ChatSidebar"
 import { ThemeProvider } from "@/components/theme-provider"
 import Home from "./page";
+import { AuthProvider } from "@/components/Auth";
 
 export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) {
   return (
@@ -16,8 +17,10 @@ export default function RootLayout({ children }: Readonly<{children: React.React
             disableTransitionOnChange
           >
             <div className="min-h-screen flex">
-              <ChatSidebar></ChatSidebar>
-              {children}
+                <AuthProvider>
+                    <ChatSidebar />
+                    {children}
+                </AuthProvider>
             </div>
           </ThemeProvider>
         </body>
