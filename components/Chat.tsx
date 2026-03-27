@@ -14,7 +14,7 @@ function Chat({ messages }: ChatProps) {
     const {user} = useAuth();
 
     return (
-        <div>
+        <div className="flex flex-col space-y-4">
             {messages?.map((message, index) => (
                 <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} mt-4`}>
                     <div className={message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}>

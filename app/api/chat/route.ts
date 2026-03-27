@@ -25,6 +25,18 @@ export async function POST(req: Request) {
 
     oauth2Client.setCredentials(user_credentials);
 
+    if (user_credentials.expiry_date && user_credentials.expiry_date <= Date.now()) {
+        const { credentials } = await oauth2Client.refreshAccessToken();
+        const cookieStore = await cookies();
+        cookieStore.set('google_auth_tokens', JSON.stringify(credentials), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            path: '/',
+            maxAge: 60 * 60 * 24 * 7,
+        });
+        oauth2Client.setCredentials(credentials);
+    }
+
     const oauth2 = google.oauth2({
       auth: oauth2Client,
       version: 'v2',
