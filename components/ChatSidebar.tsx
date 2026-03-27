@@ -16,6 +16,9 @@ export default function ChatSidebar(){
     const [authMode, setAuthMode] = useState<"singin" | "singup">();
     const isAnonymous = true;
     const { theme } = useTheme();
+    const handleLogin = () => {
+        window.location.href = '/api/google/auth';
+    };
     const handleNewChat = () => {};
     const handleSingOut = () => {};
     const path = `/logo_${theme ? theme : "dark"}.png`
@@ -37,7 +40,8 @@ export default function ChatSidebar(){
                                 <p className="text-sm mb-3">Para ter pleno acesso, logue com sua conta da SharkDev!</p>
                                 <Button onClick={()=>{
                                     setAuthMode("singin");
-                                    setShowAuthModal(true)
+                                    setShowAuthModal(true);
+                                    handleLogin();
                                 }} className="w-full" variant={"outline"} size={"sm"}>
                                     <LogIn />
                                     Login
@@ -78,7 +82,8 @@ export default function ChatSidebar(){
                             {isAnonymous ? (
                                 <Button variant={"ghost"} size={"icon"} onClick={() => {
                                     setAuthMode("singin");
-                                    setShowAuthModal(true)
+                                    setShowAuthModal(true);
+                                    handleLogin()
                                 }}>
                                     <LogIn className="h-4 w-4"/>
                                 </Button>
