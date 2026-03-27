@@ -1,6 +1,7 @@
 import "./globals.css";
 import ChatSidebar from "@/components/ChatSidebar"
 import { ThemeProvider } from "@/components/theme-provider"
+import Home from "./page";
 
 export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) {
   return (
