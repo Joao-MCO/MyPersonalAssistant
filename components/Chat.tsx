@@ -4,6 +4,7 @@ import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useAuth } from "./Auth";
 import { Card, CardContent } from "./ui/card";
+import ReactMarkdown from 'react-markdown';
 
 interface ChatProps {
     messages: { role: string; content: string }[];
@@ -24,9 +25,11 @@ function Chat({ messages }: ChatProps) {
                         </Avatar>
                         <Card className={message.role === "user" ? "bg-primary text-primary-foreground border border-pink-500/70" : " border border-pink-500"}>
                             <CardContent className="px-3">
-                                <p className="text-base leading-relaxed whitespace-pre-wrap">
-                                    {message?.content}
-                                </p>
+                                <div className="prose dark:prose-invert break-words text-base leading-relaxed overflow-hidden">
+                                    <ReactMarkdown>
+                                        {message?.content}
+                                    </ReactMarkdown>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>

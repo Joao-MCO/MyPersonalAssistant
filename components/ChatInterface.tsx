@@ -48,6 +48,11 @@ function ChatInterface() {
         return () => window.removeEventListener("clearChat", handleClearChat);
     }, []);
 
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [messages, isLoading]);
 
     const handleSendMessage = async () => {
         if (!inputMessage.trim() || isLoading) return;
@@ -158,15 +163,29 @@ function ChatInterface() {
                         </CardContent>
                     </Card>
                 </div>) :
-                (<div>
+                (<div ref={scrollRef} className="flex-1 overflow-y-auto pr-4 -mr-4 pb-4">
                     <Chat messages={messages} />
+                    {isLoading && (
+                        <div className="flex justify-start mt-4 animate-pulse">
+                            <div className="flex items-center space-x-2">
+                                <div className="h-8 w-8 rounded-full bg-pink-500/50"></div>
+                                <div className="bg-card p-3 rounded-xl border">
+                                    <span className="text-sm text-muted-foreground">Cidinha está digitando...</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>)}
                 <Card>
                     <CardContent className='pt-2'>
                         <div className='flex space-x-2'>
                             <div className='flex-1'>
                                 <Input ref={inputRef} value={inputMessage} className='min-h-12' placeholder={"Digite aqui sua mensagem..."} onChange={(e)=> setInputMessage(e.target.value)
-                                } disabled={isLoading}/>
+                                } disabled={isLoading} onKeyDown={(e) => {if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSendMessage();
+                                    }
+                                }}/>
                             </div>
                             <Button type="submit" className='h-12 w-12' size={"icon"} onClick={handleSendMessage} disabled={!inputMessage.trim() || isLoading}>
                                 <Send className='w-4 h-4' />
