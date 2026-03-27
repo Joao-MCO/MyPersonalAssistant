@@ -4,9 +4,8 @@ import React, { useRef, useState } from "react";
 import ChatInterface from "./ChatInterface";
 
 export default function HomePageContent(){
-    const [showAuthModal, setShowAuthModal] = useState(false);
-    const [authMode, setAuthMode] = useState<"singin" | "singup">();
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
     return (
         <div>
             <ChatInterface />

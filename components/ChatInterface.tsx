@@ -8,6 +8,8 @@ import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useAuth } from './Auth';
+import SingleChatPage from '@/app/chat/page';
+import Chat from './Chat';
 
 function ChatInterface() {
     const [inputMessage, setInputMessage] = useState("");
@@ -20,11 +22,11 @@ function ChatInterface() {
 
     const handleSendMessage = async () => {
         if (!inputMessage.trim() || isLoading) return;
+        setIsLoading(true);
 
         const userMessage = { role: "user", content: inputMessage };
         setMessages((prev) => [...prev, userMessage]);
         setInputMessage("");
-        setIsLoading(true);
 
         try {
             const res = await fetch("/api/chat", {
@@ -41,7 +43,7 @@ function ChatInterface() {
             if (data.output && data.output.length > 0) {
                 setMessages((prev) => [...prev, data.output[0]]);
             }
-            console.log(data.output[0].content)
+            console.log(data.output)
         } catch (error) {
             console.error("Erro ao enviar mensagem:", error);
         } finally {
@@ -80,7 +82,8 @@ function ChatInterface() {
         </header>
         <div className='flex-1 py-6 px-4'>
             <div className='w-full space-y-6 h-full flex flex-col justify-between'>
-                <div>
+                {messages.length === 0 ?
+                (<div>
                     <div className={`mb-6 bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-pink-500/20 rounded-xl p-4`}>
                         <div className='flex items-start space-x-3'>
                             <div className={`ml-8 lg:ml-0 flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-r ${theme === "light" ? "from-black" : "from-white"} to-pink-500`}>
@@ -125,15 +128,18 @@ function ChatInterface() {
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </div>) :
+                (<div>
+                    <Chat />
+                </div>)}
                 <Card>
-                    <CardContent className='pt-6'>
+                    <CardContent className='pt-2'>
                         <div className='flex space-x-2'>
                             <div className='flex-1'>
                                 <Input ref={inputRef} value={inputMessage} className='min-h-12' placeholder={"Digite aqui sua mensagem..."} onChange={(e)=> setInputMessage(e.target.value)
-                                } onKeyDownCapture={(e)=> e.key === 'Enter' ? handleSendMessage() : ""}/>
+                                } disabled={isLoading}/>
                             </div>
-                            <Button className='h-12 w-12' size={"icon"} onClick={handleSendMessage}>
+                            <Button type="submit" className='h-12 w-12' size={"icon"} onClick={handleSendMessage} disabled={!inputMessage.trim() || isLoading}>
                                 <Send className='w-4 h-4' />
                             </Button>
                         </div>

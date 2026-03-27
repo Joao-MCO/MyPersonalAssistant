@@ -24,7 +24,7 @@ export default function ChatSidebar(){
 
     const handleSingOut = async () => {
         try {
-            await logout();
+            logout();
         } catch (error) {
             console.error("Erro ao deslogar:", error);
         }
