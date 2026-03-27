@@ -2,7 +2,7 @@
 
 import { LogIn, LogOut, Trash, User } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -12,16 +12,38 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 
 export default function ChatSidebar(){
-    const [showAuthModal, setShowAuthModal] = useState(false);
-    const [authMode, setAuthMode] = useState<"singin" | "singup">();
     const isAnonymous = true;
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const { theme } = useTheme();
+    const path = `/logo_${theme ? theme : "dark"}.png`;
+
     const handleLogin = () => {
         window.location.href = '/api/google/auth';
     };
+
     const handleNewChat = () => {};
+
     const handleSingOut = () => {};
-    const path = `/logo_${theme ? theme : "dark"}.png`
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+        try {
+            const response = await fetch('/api/google/profile');
+            if (response.ok) {
+            const data = await response.json();
+            setUser(data);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar perfil:', error);
+        } finally {
+            setLoading(false);
+        }
+        };
+
+        fetchProfile();
+    }, []);
+
     const SidebarContent = () => {
         return (
             <div className="flex h-full flex-col space-x-2 mb-4">
@@ -39,8 +61,7 @@ export default function ChatSidebar(){
                                 <p className="text-sm mb-2 text-destructive">Você está conversando sem fazer o Log In.</p>
                                 <p className="text-sm mb-3">Para ter pleno acesso, logue com sua conta da SharkDev!</p>
                                 <Button onClick={()=>{
-                                    setAuthMode("singin");
-                                    setShowAuthModal(true);
+
                                     handleLogin();
                                 }} className="w-full" variant={"outline"} size={"sm"}>
                                     <LogIn />
@@ -81,8 +102,7 @@ export default function ChatSidebar(){
                         <div>
                             {isAnonymous ? (
                                 <Button variant={"ghost"} size={"icon"} onClick={() => {
-                                    setAuthMode("singin");
-                                    setShowAuthModal(true);
+
                                     handleLogin()
                                 }}>
                                     <LogIn className="h-4 w-4"/>
