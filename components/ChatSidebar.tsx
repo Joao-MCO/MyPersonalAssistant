@@ -1,6 +1,6 @@
 "use client"
 
-import { LogIn, LogOut, Plus, User } from "lucide-react";
+import { LogIn, LogOut, Trash, User } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react"
 import { Button } from "./ui/button";
@@ -26,10 +26,6 @@ export default function ChatSidebar(){
                     <Link href={"/"}>
                         <Image src={path} alt="Logo" width={150} height={20}></Image>
                     </Link>
-                    <Button onClick={handleNewChat} className="w-full" variant={"outline"}>
-                        <Plus />
-                        Nova Conversa
-                    </Button>
                 </div>
                 <Separator />
 
@@ -50,7 +46,13 @@ export default function ChatSidebar(){
                         </Card>
                     </div>
                 )}
+                <Separator />
+
                 <div className="flex-1 overflow-hidden p-4">
+                    <Button onClick={handleNewChat} className="w-full" variant={"outline"}>
+                        <Trash />
+                        Limpar Conversa
+                    </Button>
                 </div>
                 <Separator />
 
