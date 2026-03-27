@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { Separator } from "./ui/separator";
 import { Card, CardContent } from "./ui/card";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { useAuth } from "./Auth";
 
@@ -65,11 +65,18 @@ export default function ChatSidebar(){
                 <div className="p-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                            <Avatar className="w-8 h-8">
+                            {isAnonymous ?
+                            (<Avatar className="w-8 h-8">
                                 <AvatarFallback className={isAnonymous ? "bg-yellow-500" : "bg-blue-500"}>
                                     <User />
                                 </AvatarFallback>
-                            </Avatar>
+                            </Avatar>) :
+                            (<Avatar>
+                                <AvatarImage src={user.picture} alt="@shadcn" />
+                                <AvatarFallback>CN</AvatarFallback>
+                                <AvatarBadge className="bg-green-600 dark:bg-green-800" />
+                                </Avatar>
+                            )}
                             <div className="min-h-0 flex-1">
                                 <p className="text-sm font-medium line-clamp-1">{isAnonymous ? "Usuário Desconhecido" : user.name}</p>
                                 <div className="flex items-center space-x-1">
