@@ -13,12 +13,41 @@ function ChatInterface() {
     const [inputMessage, setInputMessage] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [messages, setMessages] = useState<{role: string, content: string}[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const { user, isAnonymous } = useAuth();
     const {theme} = useTheme();
 
-    const handleSendMessage = () =>{
-        console.log(inputMessage)
-    }
+    const handleSendMessage = async () => {
+        if (!inputMessage.trim() || isLoading) return;
+
+        const userMessage = { role: "user", content: inputMessage };
+        setMessages((prev) => [...prev, userMessage]);
+        setInputMessage("");
+        setIsLoading(true);
+
+        try {
+            const res = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    input_text: userMessage.content,
+                    session_messages: messages,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (data.output && data.output.length > 0) {
+                setMessages((prev) => [...prev, data.output[0]]);
+            }
+            console.log(data.output[0].content)
+        } catch (error) {
+            console.error("Erro ao enviar mensagem:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
   return (
     <div className='flex flex-col h-screen bg-background w-full'>

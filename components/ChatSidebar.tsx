@@ -22,7 +22,13 @@ export default function ChatSidebar(){
 
     const handleNewChat = () => {};
 
-    const handleSingOut = () => {};
+    const handleSingOut = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.error("Erro ao deslogar:", error);
+        }
+    };
 
 
     const SidebarContent = () => {
