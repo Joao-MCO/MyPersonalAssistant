@@ -31,7 +31,10 @@ export const createEventTool = tool(
 
     try {
       const { meeting_date, meet_length } = args;
-      const dtStart = new Date(
+
+      const pad = (n: number) => String(n).padStart(2, '0');
+
+      const startMs = Date.UTC(
         meeting_date.year,
         meeting_date.month - 1,
         meeting_date.day,
@@ -39,12 +42,17 @@ export const createEventTool = tool(
         meeting_date.minutes
       );
 
-      const dtEnd = new Date(dtStart.getTime() + meet_length * 60000);
+      const endMs = startMs + meet_length * 60000;
+
+      const formatLocalISO = (ms: number) => {
+        const d = new Date(ms);
+        return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:00`;
+      };
 
       const eventBody: any = {
         summary: args.description,
-        start: { dateTime: dtStart.toISOString(), timeZone: args.timezone },
-        end: { dateTime: dtEnd.toISOString(), timeZone: args.timezone },
+        start: { dateTime: formatLocalISO(startMs), timeZone: args.timezone },
+        end: { dateTime: formatLocalISO(endMs), timeZone: args.timezone },
         conferenceData: {
           createRequest: {
             requestId: uuidv4(),
@@ -54,7 +62,7 @@ export const createEventTool = tool(
       };
 
       if (args.attendees && args.attendees.length > 0) {
-        eventBody.attendees = args.attendees.map(email => ({ email }));
+        eventBody.attendees = args.attendees.map((email: string) => ({ email }));
       }
 
       const res = await calendar.events.insert({
@@ -106,7 +114,7 @@ export const checkCalendarTool = tool(
 
       const output = events.map(ev => {
         const when = ev.start?.dateTime || ev.start?.date;
-        return `- ${when}: ${ev.summary || "Sem título"}`;
+        return `- ID: ${ev.id} | Data/Hora: ${when} | Título: ${ev.summary || "Sem título"}`;
       });
 
       return output.join("\n");
@@ -122,6 +130,34 @@ export const checkCalendarTool = tool(
       email: z.string().default("primary"),
       start_date: dateSchema,
       end_date: dateSchema,
+    }),
+  }
+);
+
+export const deleteEventTool = tool(
+  async (args, config: RunnableConfig) => {
+    const credentials = config?.configurable?.user_credentials;
+    const calendar = getCalendarService(credentials);
+    if (!calendar) return "Usuário não logado.";
+
+    try {
+      await calendar.events.delete({
+        calendarId: args.email,
+        eventId: args.event_id,
+      });
+
+      return "Evento excluído com sucesso da sua agenda!";
+    } catch (error: any) {
+      console.error("Erro DeleteEvent:", error);
+      return `Erro ao excluir evento: ${error.message}`;
+    }
+  },
+  {
+    name: "ExcluirEvento",
+    description: "Excluir um compromisso existente no Google Calendar usando o ID do evento. SEMPRE consulte a agenda antes para obter o ID correto.",
+    schema: z.object({
+      email: z.string().default("primary").describe("O calendário do usuário, o padrão é 'primary'"),
+      event_id: z.string().describe("O ID exato do evento a ser excluído (obtido pela ferramenta ConsultarAgenda)"),
     }),
   }
 );

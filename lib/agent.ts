@@ -5,7 +5,7 @@ import { AIMessage } from "@langchain/core/messages";
 import { newsTool } from "./tools.ts/news";
 import { sharkTool } from "./tools.ts/shark";
 import { checkEmailTool, sendEmailTool } from "./tools.ts/gmail";
-import { checkCalendarTool, createEventTool } from "./tools.ts/calendar";
+import { checkCalendarTool, createEventTool, deleteEventTool } from "./tools.ts/calendar";
 
 const llm = new ChatGoogleGenerativeAI({
     model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
@@ -13,7 +13,7 @@ const llm = new ChatGoogleGenerativeAI({
     apiKey: process.env.GEMINI_API_KEY,
 });
 
-const tools = [newsTool, sharkTool, checkEmailTool, sendEmailTool, createEventTool, checkCalendarTool];
+const tools = [newsTool, sharkTool, checkEmailTool, sendEmailTool, createEventTool, checkCalendarTool, deleteEventTool];
 const llmWithTools = llm.bindTools(tools);
 
 const callModel = async (state: typeof MessagesAnnotation.State) => {

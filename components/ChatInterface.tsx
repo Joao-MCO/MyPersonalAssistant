@@ -9,6 +9,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useAuth } from './Auth';
 import Chat from './Chat';
+import { ScrollArea } from './ui/scroll-area';
 
 function ChatInterface() {
     const [inputMessage, setInputMessage] = useState("");
@@ -163,7 +164,7 @@ function ChatInterface() {
                         </CardContent>
                     </Card>
                 </div>) :
-                (<div ref={scrollRef} className="flex-1 overflow-y-auto pr-4 -mr-4 pb-4">
+                (<ScrollArea ref={scrollRef} className="flex-1 overflow-y-auto pr-4 -mr-4 pb-4">
                     <Chat messages={messages} />
                     {isLoading && (
                         <div className="flex justify-start mt-4 animate-pulse">
@@ -175,7 +176,7 @@ function ChatInterface() {
                             </div>
                         </div>
                     )}
-                </div>)}
+                </ScrollArea>)}
                 <Card>
                     <CardContent className='pt-2'>
                         <div className='flex space-x-2'>
