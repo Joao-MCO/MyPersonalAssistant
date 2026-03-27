@@ -8,7 +8,6 @@ import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useAuth } from './Auth';
-import SingleChatPage from '@/app/chat/page';
 import Chat from './Chat';
 
 function ChatInterface() {
@@ -17,21 +16,38 @@ function ChatInterface() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<{role: string, content: string}[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
     const { user, isAnonymous } = useAuth();
     const {theme} = useTheme();
 
     useEffect(() => {
-    const handleClearChat = () => {
-        setMessages([]);
-    };
+        const savedMessages = localStorage.getItem("chat_messages");
+        if (savedMessages) {
+            try {
+                setMessages(JSON.parse(savedMessages));
+            } catch (error) {
+                console.error("Erro ao ler mensagens guardadas:", error);
+            }
+        }
+        setIsLoaded(true);
+    }, []);
 
-    window.addEventListener("clearChat", handleClearChat);
+    useEffect(() => {
+        if (isLoaded) {
+            localStorage.setItem("chat_messages", JSON.stringify(messages));
+        }
+    }, [messages, isLoaded]);
 
-    // Limpar o event listener quando o componente for desmontado
-    return () => {
-        window.removeEventListener("clearChat", handleClearChat);
-    };
-}, []);
+    useEffect(() => {
+        const handleClearChat = () => {
+            setMessages([]); // Limpa da tela
+            localStorage.removeItem("chat_messages"); // Limpa da memória do navegador
+        };
+
+        window.addEventListener("clearChat", handleClearChat);
+        return () => window.removeEventListener("clearChat", handleClearChat);
+    }, []);
+
 
     const handleSendMessage = async () => {
         if (!inputMessage.trim() || isLoading) return;
