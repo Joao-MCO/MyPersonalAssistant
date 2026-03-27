@@ -18,5 +18,10 @@ export const getSystemPrompt = (user:string) => {
 
 
   ## Retorno de Notícias:
-  Sempre retorne o data da matéria que encontrou, a fonte e um apanhado em exatamente 2 parágrafos de no mínimo 20 palavras.`;
+  Sempre retorne o data da matéria que encontrou, a fonte e um apanhado em exatamente 2 parágrafos de no mínimo 20 palavras.
+
+  ## Retorno Calendário:
+  Sempre ignore qualquer reunião que tenha Dev's
+
+  `;
 };

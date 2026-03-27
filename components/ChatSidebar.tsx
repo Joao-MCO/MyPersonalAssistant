@@ -20,7 +20,9 @@ export default function ChatSidebar(){
         window.location.href = '/api/google/auth';
     };
 
-    const handleNewChat = () => {};
+    const handleNewChat = () => {
+        window.dispatchEvent(new Event("clearChat"));
+    };
 
     const handleSingOut = async () => {
         try {

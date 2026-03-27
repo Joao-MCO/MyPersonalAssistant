@@ -1,6 +1,6 @@
 import { Send, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Badge } from './ui/badge';
 import { ModeToggle } from './ModeToggle';
 import { useTheme } from 'next-themes';
@@ -19,6 +19,19 @@ function ChatInterface() {
     const [isLoading, setIsLoading] = useState(false);
     const { user, isAnonymous } = useAuth();
     const {theme} = useTheme();
+
+    useEffect(() => {
+    const handleClearChat = () => {
+        setMessages([]);
+    };
+
+    window.addEventListener("clearChat", handleClearChat);
+
+    // Limpar o event listener quando o componente for desmontado
+    return () => {
+        window.removeEventListener("clearChat", handleClearChat);
+    };
+}, []);
 
     const handleSendMessage = async () => {
         if (!inputMessage.trim() || isLoading) return;
@@ -130,7 +143,7 @@ function ChatInterface() {
                     </Card>
                 </div>) :
                 (<div>
-                    <Chat />
+                    <Chat messages={messages} />
                 </div>)}
                 <Card>
                     <CardContent className='pt-2'>
