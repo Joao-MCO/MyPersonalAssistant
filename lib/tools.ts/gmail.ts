@@ -38,22 +38,20 @@ export const checkEmailTool = tool(
       if (messages.length === 0) return "Nenhum e-mail encontrado.";
 
       const emailsRetornados = [];
-      for (const msg of messages) {
-        if (!msg.id) continue;
-        const detail = await gmail.users.messages.get({
-          userId: "me",
-          id: msg.id,
-          format: "metadata",
-          metadataHeaders: ["Subject", "From"],
-        });
+      const details = await Promise.all(
+        messages.map(msg => gmail.users.messages.get({
+                userId: 'me', id: msg.id, format: 'metadata',
+                metadataHeaders: ['Subject', 'From', 'Date'],
+            }))
+        );
+        for(const detail of details){
+            const headers = detail.data.payload?.headers || [];
+            const subject = headers.find(h => h.name === "Subject")?.value || "Sem assunto";
+            const sender = headers.find(h => h.name === "From")?.value || "Desconhecido";
+            const snippet = detail.data.snippet || "Sem resumo";
 
-        const headers = detail.data.payload?.headers || [];
-        const subject = headers.find(h => h.name === "Subject")?.value || "Sem assunto";
-        const sender = headers.find(h => h.name === "From")?.value || "Desconhecido";
-        const snippet = detail.data.snippet || "Sem resumo";
-
-        emailsRetornados.push(`De: ${sender}\nAssunto: ${subject}\nResumo: ${snippet}...`);
-      }
+            emailsRetornados.push(`De: ${sender}\nAssunto: ${subject}\nResumo: ${snippet}...`);
+        }
 
       return emailsRetornados.join("\n\n---\n\n");
     } catch (error: any) {

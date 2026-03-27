@@ -29,9 +29,11 @@ export async function GET() {
       version: 'v2',
     });
 
-    const res = await oauth2.userinfo.get();
+    const userInfo = await oauth2.userinfo.get();
 
-    return NextResponse.json(res.data);
+    cookieStore.set('user_info', JSON.stringify(userInfo.data));
+
+    return NextResponse.json(userInfo.data);
 
   } catch (error) {
     console.error('Erro ao buscar dados do usuário:', error);

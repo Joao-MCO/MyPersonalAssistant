@@ -39,4 +39,7 @@ const workflow = new StateGraph(MessagesAnnotation)
     .addConditionalEdges("agent", shouldContinue)
     .addEdge("tools", "agent");
 
-export const cidinhaAgent = workflow.compile();
+export const cidinhaAgent = workflow.compile({
+  checkpointer: undefined,
+  interruptBefore: undefined,
+});
