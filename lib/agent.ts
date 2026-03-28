@@ -2,10 +2,10 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { StateGraph, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { AIMessage } from "@langchain/core/messages";
-import { newsTool } from "./tools.ts/news";
-import { sharkTool } from "./tools.ts/shark";
-import { checkEmailTool, sendEmailTool } from "./tools.ts/gmail";
-import { checkCalendarTool, createEventTool, deleteEventTool } from "./tools.ts/calendar";
+import { newsTool } from "./tools/news";
+import { sharkTool } from "./tools/shark";
+import { checkEmailTool, sendEmailTool } from "./tools/gmail";
+import { checkCalendarTool, createEventTool, deleteEventTool } from "./tools/calendar";
 
 const llm = new ChatGoogleGenerativeAI({
     model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
