@@ -56,7 +56,6 @@ function Chat({ messages, isStreaming }: ChatProps) {
                                             },
 
                                             pre({ children }) {
-                                                // 🔥 aqui sim vira bloco
                                                 return <CodeBlock>{children}</CodeBlock>;
                                             },
                                         }}

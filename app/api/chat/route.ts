@@ -111,7 +111,7 @@ export async function POST(req: Request) {
                                 typeof chunk === "string"
                                     ? chunk
                                     : Array.isArray(chunk?.content)
-                                      ? chunk.content.map((c) => c.text).join("")
+                                      ? chunk.content.map((c:{text:string}) => c.text).join("")
                                       : chunk?.content || chunk?.text || "";
 
                             if (content) {
