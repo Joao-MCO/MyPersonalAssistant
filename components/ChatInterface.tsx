@@ -1,13 +1,7 @@
-import { Send, Sparkles, FileArchive } from "lucide-react";
-import Link from "next/link";
+import { Send, FileArchive } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { Badge } from "./ui/badge";
-import { ModeToggle } from "./ModeToggle";
-import { useTheme } from "next-themes";
-import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useAuth } from "./Auth";
 import Chat from "./Chat";
 import { ScrollArea } from "./ui/scroll-area";
 
@@ -24,8 +18,12 @@ function ChatInterface() {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    const { user, isAnonymous } = useAuth();
-    const { theme } = useTheme();
+    const [activeTool, setActiveTool] = useState<string | null>(null);
+
+    const TOOL_LABELS: Record<string, string> = {
+        checkCalendarTool: "📅 Consultando agenda...",
+        sendEmailTool: "📧 Enviando email...",
+    };
 
     useEffect(() => {
         const savedMessages = localStorage.getItem("chat_messages");
@@ -101,27 +99,48 @@ function ChatInterface() {
                 const lines = buffer.split("\n");
                 buffer = lines.pop() || "";
 
-                for (const line of lines) {
-                    if (!line.trim()) continue;
+                buffer += decoder.decode(value, { stream: true });
+
+                let boundary;
+
+                while ((boundary = buffer.indexOf("\n")) >= 0) {
+                    const line = buffer.slice(0, boundary).trim();
+                    buffer = buffer.slice(boundary + 1);
+
+                    if (!line) continue;
 
                     try {
                         const parsed = JSON.parse(line);
 
-                        assistantMessage.content += parsed.content;
+                        // 🔥 TOOL EVENTS
+                        if (parsed.type === "tool_start") {
+                            setActiveTool(parsed.tool);
+                            continue;
+                        }
 
-                        setMessages((prev) => {
-                            const updated = [...prev];
-                            updated[updated.length - 1] = { ...assistantMessage };
-                            return updated;
-                        });
+                        if (parsed.type === "tool_end") {
+                            setActiveTool(null);
+                            continue;
+                        }
+
+                        // 🔥 STREAM TOKEN
+                        if (parsed.role === "assistant") {
+                            assistantMessage.content += parsed.content;
+
+                            setMessages((prev) => {
+                                const updated = [...prev];
+                                updated[updated.length - 1] = { ...assistantMessage };
+                                return updated;
+                            });
+                        }
                     } catch (err) {
-                        console.error("Erro ao parsear:", err);
+                        console.error("Erro ao parsear linha:", line);
                     }
                 }
             }
 
             inputRef.current?.focus();
-            setFiles([]); // limpa arquivos após envio
+            setFiles([]);
         } catch (error) {
             console.error("Erro ao enviar mensagem:", error);
         } finally {
@@ -135,18 +154,22 @@ function ChatInterface() {
             <main className="flex-1 overflow-hidden flex flex-col">
                 <ScrollArea ref={scrollRef} className="h-full w-full">
                     <div className="max-w-3xl mx-auto py-8 px-4">
-                        <Chat messages={messages} isStreaming={isStreaming} />
-
                         {isLoading && !isStreaming && (
-                            <div className="mt-4 animate-pulse text-sm text-muted-foreground">Pensando...</div>
+                            <div className="mt-4 animate-pulse text-sm text-muted-foreground">
+                                {activeTool && (
+                                    <div className="text-sm text-muted-foreground mb-2 animate-pulse">
+                                        {TOOL_LABELS[activeTool] || `⚙️ Executando ${activeTool}`}
+                                    </div>
+                                )}
+                            </div>
                         )}
+                        <Chat messages={messages} isStreaming={isStreaming} />
                     </div>
                 </ScrollArea>
             </main>
 
             <footer className="p-4 border-t">
                 <div className="max-w-3xl mx-auto space-y-2">
-                    {/* preview arquivos */}
                     {files.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                             {files.map((file, index) => (

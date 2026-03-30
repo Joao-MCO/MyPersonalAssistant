@@ -36,19 +36,28 @@ function Chat({ messages, isStreaming }: ChatProps) {
                             }
                         >
                             <CardContent className="px-3">
-                                <div className="prose dark:prose-invert break-words text-base leading-relaxed overflow-hidden">
+                                <div className="prose dark:prose-invert wrap-break-word text-base leading-relaxed overflow-hidden">
                                     <ReactMarkdown
                                         components={{
+                                            p({ children }) {
+                                                return <p className="mb-2">{children}</p>;
+                                            },
+
                                             code({ inline, className, children, ...props }: any) {
                                                 if (inline) {
-                                                    return <code className="bg-muted px-1 rounded">{children}</code>;
+                                                    return (
+                                                        <code className="bg-muted px-1 py-0.5 rounded text-sm">
+                                                            {children}
+                                                        </code>
+                                                    );
                                                 }
 
-                                                return (
-                                                    <CodeBlock className={className}>
-                                                        {String(children).replace(/\n$/, "")}
-                                                    </CodeBlock>
-                                                );
+                                                return <code className={className}>{children}</code>;
+                                            },
+
+                                            pre({ children }) {
+                                                // 🔥 aqui sim vira bloco
+                                                return <CodeBlock>{children}</CodeBlock>;
                                             },
                                         }}
                                     >

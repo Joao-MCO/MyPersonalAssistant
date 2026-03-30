@@ -19,8 +19,8 @@ export default function CodeBlock({ children, className }: Props) {
   };
 
   return (
-    <div className="relative group">
-      <pre className={`p-4 rounded-lg overflow-x-auto text-sm ${className}`}>
+    <div className="relative group my-4">
+      <pre className={`p-4 rounded-lg overflow-x-auto text-sm bg-black text-white ${className}`}>
         <code>{children}</code>
       </pre>
 
