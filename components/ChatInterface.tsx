@@ -11,7 +11,6 @@ function ChatInterface() {
     const [isStreaming, setIsStreaming] = useState(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
-    const scrollRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
@@ -20,36 +19,56 @@ function ChatInterface() {
 
     const [activeTool, setActiveTool] = useState<string | null>(null);
 
+    const [isAtBottom, setIsAtBottom] = useState(true);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const [toolHistory, setToolHistory] = useState<string[]>([]);
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const bottomRef = useRef<HTMLDivElement>(null);
+
     const TOOL_LABELS: Record<string, string> = {
         checkCalendarTool: "📅 Consultando agenda...",
         sendEmailTool: "📧 Enviando email...",
     };
 
+    const scrollToBottom = () => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        setIsAtBottom(true);
+    };
+
     useEffect(() => {
-        const savedMessages = localStorage.getItem("chat_messages");
-        if (savedMessages) {
-            try {
-                setMessages(JSON.parse(savedMessages));
-            } catch (error) {
-                console.error("Erro ao ler mensagens guardadas:", error);
-            }
+        const el = containerRef.current;
+        if (!el) return;
+
+        const handleScroll = () => {
+            const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+
+            setIsAtBottom(atBottom);
+        };
+
+        handleScroll();
+
+        el.addEventListener("scroll", handleScroll);
+
+        return () => el.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    useEffect(() => {
+        if (isAtBottom) {
+            scrollToBottom();
         }
+    }, [messages, isAtBottom]);
+
+    useEffect(() => {
+        const saved = localStorage.getItem("chat_messages");
+        if (saved) setMessages(JSON.parse(saved));
         setIsLoaded(true);
     }, []);
 
     useEffect(() => {
-        if (isLoaded) {
-            localStorage.setItem("chat_messages", JSON.stringify(messages));
-        }
+        if (!isLoaded) return;
+        localStorage.setItem("chat_messages", JSON.stringify(messages));
     }, [messages, isLoaded]);
-
-    useEffect(() => {
-        if (scrollRef.current) {
-            const el = scrollRef.current;
-            const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
-            if (isNearBottom) el.scrollTop = el.scrollHeight;
-        }
-    }, [messages]);
 
     const handleSendMessage = async () => {
         if ((!inputMessage.trim() && files.length === 0) || isLoading) return;
@@ -61,6 +80,9 @@ function ChatInterface() {
             role: "user",
             content: inputMessage + (files.length ? ` 📎 ${files.map((f) => f.name).join(", ")}` : ""),
         };
+
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
 
         setMessages((prev) => [...prev, userMessage]);
         setInputMessage("");
@@ -78,6 +100,7 @@ function ChatInterface() {
             const res = await fetch("/api/chat", {
                 method: "POST",
                 body: formData,
+                signal: controller.signal,
             });
 
             if (!res.body) throw new Error("Sem stream");
@@ -89,15 +112,11 @@ function ChatInterface() {
             setMessages((prev) => [...prev, assistantMessage]);
 
             let buffer = "";
+            let accumulated = "";
 
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
-
-                buffer += decoder.decode(value);
-
-                const lines = buffer.split("\n");
-                buffer = lines.pop() || "";
 
                 buffer += decoder.decode(value, { stream: true });
 
@@ -109,36 +128,37 @@ function ChatInterface() {
 
                     if (!line) continue;
 
-                    try {
-                        const parsed = JSON.parse(line);
+                    const parsed = JSON.parse(line);
 
-                        // 🔥 TOOL EVENTS
-                        if (parsed.type === "tool_start") {
-                            setActiveTool(parsed.tool);
-                            continue;
-                        }
+                    if (parsed.type === "tool_start") {
+                        setActiveTool(parsed.tool);
+                        setToolHistory((prev) => [...prev, parsed.tool]);
+                        continue;
+                    }
 
-                        if (parsed.type === "tool_end") {
-                            setActiveTool(null);
-                            continue;
-                        }
+                    if (parsed.type === "tool_end") {
+                        setTimeout(() => setActiveTool(null), 500);
+                        continue;
+                    }
 
-                        // 🔥 STREAM TOKEN
-                        if (parsed.role === "assistant") {
-                            assistantMessage.content += parsed.content;
+                    if (parsed.role === "assistant") {
+                        accumulated += parsed.content;
 
+                        requestAnimationFrame(() => {
                             setMessages((prev) => {
                                 const updated = [...prev];
-                                updated[updated.length - 1] = { ...assistantMessage };
+
+                                updated[updated.length - 1] = {
+                                    role: "assistant",
+                                    content: accumulated,
+                                };
+
                                 return updated;
                             });
-                        }
-                    } catch (err) {
-                        console.error("Erro ao parsear linha:", line);
+                        });
                     }
                 }
             }
-
             inputRef.current?.focus();
             setFiles([]);
         } catch (error) {
@@ -152,8 +172,18 @@ function ChatInterface() {
     return (
         <div className="flex flex-col h-screen bg-background w-full overflow-hidden">
             <main className="flex-1 overflow-hidden flex flex-col">
-                <ScrollArea ref={scrollRef} className="h-full w-full">
+                <div className="flex-1 overflow-y-auto w-full relative" ref={containerRef}>
                     <div className="max-w-3xl mx-auto py-8 px-4">
+                        {!isAtBottom && (
+                            <button
+                                onClick={scrollToBottom}
+                                className={`fixed bottom-32 right-40/100 translate-x-1/2 z-50 bg-zinc-800 text-white p-3 rounded-full shadow-lg hover:bg-zinc-700 ${
+                                    isAtBottom ? "opacity-0 pointer-events-none" : "opacity-100"
+                                }`}
+                            >
+                                ↓
+                            </button>
+                        )}
                         {isLoading && !isStreaming && (
                             <div className="mt-4 animate-pulse text-sm text-muted-foreground">
                                 {activeTool && (
@@ -164,8 +194,9 @@ function ChatInterface() {
                             </div>
                         )}
                         <Chat messages={messages} isStreaming={isStreaming} />
+                        <div ref={bottomRef} />
                     </div>
-                </ScrollArea>
+                </div>
             </main>
 
             <footer className="p-4 border-t">
@@ -209,10 +240,8 @@ function ChatInterface() {
                             <FileArchive />
                         </Button>
 
-                        <Input
-                            ref={inputRef}
+                        <textarea
                             value={inputMessage}
-                            placeholder="Digite sua mensagem..."
                             onChange={(e) => setInputMessage(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter" && !e.shiftKey) {
@@ -220,7 +249,9 @@ function ChatInterface() {
                                     handleSendMessage();
                                 }
                             }}
-                            disabled={isLoading}
+                            rows={1}
+                            placeholder="Insira seu texto..."
+                            className="w-full resize-none max-h-40 min-h-10 overflow-y-auto p-2"
                         />
 
                         <Button onClick={handleSendMessage} disabled={isLoading}>
