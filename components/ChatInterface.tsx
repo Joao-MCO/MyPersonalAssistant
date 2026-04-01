@@ -251,7 +251,16 @@ function ChatInterface() {
                             }}
                             rows={1}
                             placeholder="Insira seu texto..."
-                            className="w-full resize-none max-h-40 min-h-10 overflow-y-auto p-2"
+                            className="
+                                w-full resize-none
+                                max-h-40 min-h-11
+                                overflow-y-auto
+                                p-3
+                                rounded-xl
+                                bg-zinc-900
+                                border border-zinc-700
+                                focus:outline-none focus:ring-2 focus:ring-pink-500
+                            "
                         />
 
                         <Button onClick={handleSendMessage} disabled={isLoading}>

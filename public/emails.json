@@ -1,0 +1,158 @@
+[
+  {
+    "nome": "João Marcos Cardoso - SharkDev",
+    "email": "joao.cardoso@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["Blip", "White"]
+  },
+  {
+    "nome": "Paulo Moreira - SharkDev",
+    "email": "paulo.moreira@sharkdev.com.br",
+    "role": "PM",
+    "team": ["Blip", "White"]
+  },
+  {
+    "nome": "Márcio Henrique SharkDev",
+    "email": "marciohsilva@sharkdev.com.br",
+    "role": "Owner",
+    "team": ["Blip", "White", "Others"]
+  },
+  {
+    "nome": "Gabriel Valias - SharkDev",
+    "email": "gabriel.valias@sharkdev.com.br",
+    "role": "PM",
+    "team": ["Blip", "Others"]
+  },
+  {
+    "nome": "Priscila Murarolli - SharkDev",
+    "email": "priscila@sharkdev.com.br",
+    "role": "PM",
+    "team": ["Blip", "White", "Others"]
+  },
+  {
+    "nome": "Heverton Gonçalves - SharkDev",
+    "email": "heverton.goncalves@sharkdev.com.br",
+    "role": "Support Leader",
+    "team": ["Blip"]
+  },
+  {
+    "nome": "Frederico Maihub - SharkDev",
+    "email": "frederico.maihub@sharkdev.com.br",
+    "role": "Tech Leader",
+    "team": ["Blip"]
+  },
+  {
+    "nome": "João Batista Martins - SharkDev",
+    "email": "joao.martins@sharkdev.com.br",
+    "role": "UX Leader",
+    "team": ["Blip"]
+  },
+  {
+    "nome": "Malu Ancântara - SharkDev",
+    "email": "malu.alcantara@sharkdev.com.br",
+    "role": "Marketing",
+    "team": ["Others"]
+  },
+  {
+    "nome": "Pâmela Scotini - SharkDev",
+    "email": "pamela@sharkdev.com.br",
+    "role": "Human Resources",
+    "team": ["Others"]
+  },
+  {
+    "nome": "Anna Silva - SharkDev",
+    "email": "anna.silva@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["Blip"]
+  },
+  {
+    "nome": "Karina Marques - SharkDev",
+    "email": "karina.marques@sharkdev.com.br",
+    "role": "Sales",
+    "team": ["Others"]
+  },
+  {
+    "nome": "Ítalo Rezende",
+    "email": "italo.rezende@sharkdev.com.br",
+    "role": "Tech Leader",
+    "team": ["White"]
+  },
+  {
+    "nome": "João Farias - SharkDev",
+    "email": "joao.farias@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["Blip", "White"]
+  },
+  {
+    "nome": "Mikaeli Sampaio - SharkDev",
+    "email": "mikaeli.sampaio@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["White"]
+  },
+  {
+    "nome": "René Gonçalves - SharkDev",
+    "email": "rene@sharkdev.com.br",
+    "role": "Owner",
+    "team": ["Blip", "White", "Others"]
+  },
+  {
+    "nome": "José Lócio - SharkDev",
+    "email": "jose.locio@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["Blip"]
+  },
+  {
+    "nome": "Breno Mendes - SharkDev",
+    "email": "breno.mendes@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["White"]
+  },
+  {
+    "nome": "Caique Duarte - SharkDev",
+    "email": "caique.duarte@sharkdev.com.br",
+    "role": "Sales",
+    "team": ["White", "Others"]
+  },
+  {
+    "nome": "Weguiton Cunha - SharkDev",
+    "email": "weguiton.cunha@sharkdev.com.br",
+    "role": "UX",
+    "team": ["Blip"]
+  },
+  {
+    "nome": "Douglas Melo - SharkDev",
+    "email": "douglas.melo@sharkdev.com.br",
+    "role": "Support",
+    "team": ["Blip"]
+  },
+  {
+    "nome": "Fabrício Souza - SharkDev",
+    "email": "fabricio.souza@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["Blip"]
+  },
+  {
+    "nome": "Vinicius Lambert - SharkDev",
+    "email": "vinicius.lambert@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["White"]
+  },
+  {
+    "nome": "Guilherme Brito - SharkDev",
+    "email": "guilherme.brito@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["White"]
+  },
+  {
+    "nome": "Lucas Gouvêa - SharkDev",
+    "email": "lucas.gouvea@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["White"]
+  },
+  {
+    "nome": "Jonatas Alves - SharkDev",
+    "email": "jonatas.alves@sharkdev.com.br",
+    "role": "Developer",
+    "team": ["Blip"]
+  }
+]

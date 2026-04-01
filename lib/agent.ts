@@ -4,8 +4,8 @@ import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { AIMessage } from "@langchain/core/messages";
 import { newsTool } from "./tools/news";
 import { sharkTool } from "./tools/shark";
-import { checkEmailTool, sendEmailTool } from "./tools/gmail";
-import { checkCalendarTool, createEventTool, deleteEventTool } from "./tools/calendar";
+import { checkEmailTool, readFullEmailTool, sendEmailTool } from "./tools/gmail";
+import { checkCalendarTool, createEventTool, deleteEventTool, freeBusyTool } from "./tools/calendar";
 import { sqlTool } from "./tools/query";
 
 const llm = new ChatGoogleGenerativeAI({
@@ -14,7 +14,18 @@ const llm = new ChatGoogleGenerativeAI({
     apiKey: process.env.GEMINI_API_KEY,
 });
 
-const tools = [newsTool, sharkTool, checkEmailTool, sendEmailTool, createEventTool, checkCalendarTool, deleteEventTool, sqlTool];
+const tools = [
+    newsTool,
+    sharkTool,
+    checkEmailTool,
+    sendEmailTool,
+    readFullEmailTool,
+    createEventTool,
+    checkCalendarTool,
+    deleteEventTool,
+    freeBusyTool,
+    sqlTool
+];
 const llmWithTools = llm.bindTools(tools);
 
 const callModel = async (state: typeof MessagesAnnotation.State) => {

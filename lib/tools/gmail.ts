@@ -101,9 +101,13 @@ export const sendEmailTool = tool(
                 .replace(/\//g, "_")
                 .replace(/=+$/, "");
 
+            const requestBody: any = { raw: encodedMessage };
+            if (args.threadId) {
+                requestBody.threadId = args.threadId;
+            }
             await gmail.users.messages.send({
                 userId: "me",
-                requestBody: { raw: encodedMessage },
+                requestBody: requestBody,
             });
 
             return "Email enviado com sucesso.";
@@ -120,6 +124,35 @@ export const sendEmailTool = tool(
             subject: z.string().describe("Assunto do email"),
             body: z.string().describe("Corpo do email"),
             body_type: z.string().default("plain").describe("plain ou html"),
+            threadId: z.string().optional().describe("ID da thread se for responder a um email"),
+        }),
+    },
+);
+
+export const readFullEmailTool = tool(
+    async (args, config: RunnableConfig) => {
+        const credentials = config?.configurable?.user_credentials;
+        const gmail = getGmailService(credentials);
+        if (!gmail) return "Usuário não logado.";
+
+        try {
+            const res = await gmail.users.messages.get({
+                userId: "me",
+                id: args.email_id,
+                format: "raw",
+            });
+
+            const decodedBody = Buffer.from(res.data.raw || "", "base64").toString("utf-8");
+            return decodedBody;
+        } catch (error: any) {
+            return `Erro ao ler email: ${error.message}`;
+        }
+    },
+    {
+        name: "LerEmailCompleto",
+        description: "Lê o corpo completo de um e-mail específico através do seu ID.",
+        schema: z.object({
+            email_id: z.string().describe("ID do e-mail retornado pela ferramenta ConsultarEmail"),
         }),
     },
 );

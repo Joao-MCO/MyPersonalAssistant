@@ -162,3 +162,42 @@ export const deleteEventTool = tool(
         }),
     },
 );
+
+export const freeBusyTool = tool(
+    async (args, config: RunnableConfig) => {
+        const credentials = config?.configurable?.user_credentials;
+        const calendar = getCalendarService(credentials);
+        if (!calendar) return "Usuário não logado.";
+
+        try {
+            const parseDate = (d: z.infer<typeof dateSchema>) => {
+                return new Date(Date.UTC(d.year, d.month - 1, d.day, d.hours, d.minutes)).toISOString();
+            };
+
+            const res = await calendar.freebusy.query({
+                requestBody: {
+                    timeMin: parseDate(args.start_date),
+                    timeMax: parseDate(args.end_date),
+                    items: [{ id: args.email }],
+                },
+            });
+
+            const busySlots = res.data.calendars?.[args.email]?.busy || [];
+            if (busySlots.length === 0) return "A agenda está totalmente livre neste período.";
+
+            const output = busySlots.map((slot) => `- Ocupado de: ${slot.start} até ${slot.end}`);
+            return `Horários ocupados encontrados:\n${output.join("\n")}\n\nQualquer horário fora destes blocos está livre.`;
+        } catch (error: any) {
+            return `Erro ao consultar disponibilidade: ${error.message}`;
+        }
+    },
+    {
+        name: "ProcurarTempoLivre",
+        description: "Verifica os blocos de tempo em que o usuário está ocupado para encontrar espaços livres para marcar reuniões.",
+        schema: z.object({
+            email: z.string().default("primary"),
+            start_date: dateSchema,
+            end_date: dateSchema,
+        }),
+    }
+);

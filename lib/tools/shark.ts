@@ -28,14 +28,19 @@ export const sharkTool = tool(
                 queryEmbeddings: queryEmbeddings,
                 nResults: 3,
             });
-            const documents = data.documents || [];
-            const flatDocs = documents.flat().filter((doc) => doc !== null) as string[];
+            const documents = data.documents[0] || [];
+            const metadatas = data.metadatas[0] || [];
 
-            if (flatDocs.length === 0) {
+            if (documents.length === 0) {
                 return "Não encontrei informações internas sobre esse assunto na base da SharkDev.";
             }
 
-            return flatDocs.join("\n\n---\n\n");
+            const output = documents.map((doc, index) => {
+                const fonte = metadatas[index]?.source || "Documento Interno";
+                return `[Fonte: ${fonte}]\n${doc}`;
+            });
+
+            return output.join("\n\n---\n\n");
         } catch (error: any) {
             console.error("Erro RAG Shark:", error);
             return "Erro ao consultar base de conhecimento da SharkDev.";

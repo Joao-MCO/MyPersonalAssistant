@@ -19,7 +19,7 @@ function Chat({ messages, isStreaming }: ChatProps) {
         <div className="flex flex-col space-y-4">
             {messages?.map((message, index) => (
                 <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} mt-4`}>
-                    <div className={message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}>
+                    <div className={`flex items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
                         <Avatar className="h-8 w-8">
                             {message.role === "user" ? (
                                 <AvatarImage src={user?.picture} alt="@shadcn" />
@@ -29,11 +29,10 @@ function Chat({ messages, isStreaming }: ChatProps) {
                             <AvatarFallback className={message.role === "user" ? "bg-blue-500" : "bg-pink-500"} />
                         </Avatar>
                         <Card
-                            className={
-                                message.role === "user"
-                                    ? "bg-primary text-primary-foreground border border-pink-500/70"
-                                    : " border border-pink-500"
-                            }
+                            className={`
+                                max-w-[75%]
+                                ${message.role === "user" ? "bg-primary text-primary-foreground border border-pink-500/70" : "border border-pink-500"}
+                            `}
                         >
                             <CardContent className="px-3">
                                 <div className="prose dark:prose-invert wrap-break-word text-base leading-relaxed overflow-hidden">
@@ -43,7 +42,7 @@ function Chat({ messages, isStreaming }: ChatProps) {
                                                 return <p className="mb-2">{children}</p>;
                                             },
 
-                                            code({ inline, className, children, ...props }: any) {
+                                            code({ inline, className, children }: any) {
                                                 if (inline) {
                                                     return (
                                                         <code className="bg-muted px-1 py-0.5 rounded text-sm">
@@ -52,11 +51,7 @@ function Chat({ messages, isStreaming }: ChatProps) {
                                                     );
                                                 }
 
-                                                return <code className={className}>{children}</code>;
-                                            },
-
-                                            pre({ children }) {
-                                                return <CodeBlock>{children}</CodeBlock>;
+                                                return <CodeBlock>{String(children)}</CodeBlock>;
                                             },
                                         }}
                                     >
@@ -64,7 +59,7 @@ function Chat({ messages, isStreaming }: ChatProps) {
                                     </ReactMarkdown>
 
                                     {index === messages.length - 1 && message.role === "assistant" && isStreaming && (
-                                        <span className="animate-pulse ml-1">▍</span>
+                                        <span className="ml-1 inline-block w-2 h-4 bg-white animate-pulse rounded-sm" />
                                     )}
                                 </div>
                             </CardContent>
