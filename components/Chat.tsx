@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useAuth } from "./Auth";
 import { Card, CardContent } from "./ui/card";
 import ReactMarkdown from "react-markdown";
 import CodeBlock from "./CodeBlock";
+import { Copy } from "lucide-react";
 
 interface ChatProps {
     messages: { role: string; content: string }[];
@@ -14,9 +15,14 @@ interface ChatProps {
 
 function Chat({ messages, isStreaming }: ChatProps) {
     const { user } = useAuth();
-
     return (
         <div className="flex flex-col space-y-4">
+            {messages.length === 0 && (
+                <div className="text-center text-muted-foreground mt-20">
+                    <p>Comece uma conversa 👋</p>
+                    <p className="text-sm">Pergunte algo ou envie um arquivo</p>
+                </div>
+            )}
             {messages?.map((message, index) => (
                 <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} mt-4`}>
                     <div className={`flex items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
@@ -30,7 +36,7 @@ function Chat({ messages, isStreaming }: ChatProps) {
                         </Avatar>
                         <Card
                             className={`
-                                max-w-[75%]
+                                max-w-[85%] sm:max-w-[75%]
                                 ${message.role === "user" ? "bg-primary text-primary-foreground border border-pink-500/70" : "border border-pink-500"}
                             `}
                         >
@@ -60,6 +66,14 @@ function Chat({ messages, isStreaming }: ChatProps) {
 
                                     {index === messages.length - 1 && message.role === "assistant" && isStreaming && (
                                         <span className="ml-1 inline-block w-2 h-4 bg-white animate-pulse rounded-sm" />
+                                    )}
+                                    {message.role === "assistant" && (
+                                        <button
+                                            onClick={() => navigator.clipboard.writeText(message.content)}
+                                            className="text-xs text-muted-foreground mt-1 hover:underline"
+                                        >
+                                            <Copy className="w-4 h-4"/>
+                                        </button>
                                     )}
                                 </div>
                             </CardContent>

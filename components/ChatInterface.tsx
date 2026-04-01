@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import Chat from "./Chat";
 import { ScrollArea } from "./ui/scroll-area";
+import { Textarea } from "./ui/textarea";
 
 function ChatInterface() {
     const [inputMessage, setInputMessage] = useState("");
@@ -184,13 +185,9 @@ function ChatInterface() {
                                 ↓
                             </button>
                         )}
-                        {isLoading && !isStreaming && (
-                            <div className="mt-4 animate-pulse text-sm text-muted-foreground">
-                                {activeTool && (
-                                    <div className="text-sm text-muted-foreground mb-2 animate-pulse">
-                                        {TOOL_LABELS[activeTool] || `⚙️ Executando ${activeTool}`}
-                                    </div>
-                                )}
+                        {(isStreaming || isLoading) && activeTool && (
+                            <div className="sticky top-0 z-10 mb-4 text-sm text-muted-foreground animate-pulse bg-background/80 backdrop-blur p-2 rounded-md">
+                                {TOOL_LABELS[activeTool] || `⚙️ Executando ${activeTool}`}
                             </div>
                         )}
                         <Chat messages={messages} isStreaming={isStreaming} />
@@ -205,7 +202,7 @@ function ChatInterface() {
                         <div className="flex flex-wrap gap-2">
                             {files.map((file, index) => (
                                 <div key={index} className="bg-muted px-2 py-1 rounded text-xs flex items-center gap-2">
-                                    {file.name}
+                                    {file.name} ({(file.size / 1024).toFixed(1)} KB)
                                     <button onClick={() => setFiles((prev) => prev.filter((_, i) => i !== index))}>
                                         ❌
                                     </button>
@@ -240,7 +237,7 @@ function ChatInterface() {
                             <FileArchive />
                         </Button>
 
-                        <textarea
+                        <Textarea
                             value={inputMessage}
                             onChange={(e) => setInputMessage(e.target.value)}
                             onKeyDown={(e) => {
@@ -261,11 +258,28 @@ function ChatInterface() {
                                 border border-zinc-700
                                 focus:outline-none focus:ring-2 focus:ring-pink-500
                             "
+                            onInput={(e) => {
+                                const target = e.target as HTMLTextAreaElement;
+                                target.style.height = "auto";
+                                target.style.height = target.scrollHeight + "px";
+                            }}
                         />
 
                         <Button onClick={handleSendMessage} disabled={isLoading}>
                             <Send />
                         </Button>
+                        {isStreaming && (
+                            <Button
+                                variant="destructive"
+                                onClick={() => {
+                                    abortControllerRef.current?.abort();
+                                    setIsStreaming(false);
+                                    setIsLoading(false);
+                                }}
+                            >
+                                Parar
+                            </Button>
+                        )}
                     </div>
                 </div>
             </footer>
